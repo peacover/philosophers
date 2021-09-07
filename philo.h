@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yer-raki <yer-raki@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 15:14:06 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/07/05 17:41:00 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/07 18:33:44 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # include <sys/time.h>
 # include <pthread.h>
 
-typedef struct s_infos
+typedef struct s_args
 {
 	int	nb_ph;
 	int	t_die;
@@ -27,6 +27,26 @@ typedef struct s_infos
 	int	t_sleep;
 	int	nb_t_eat;
 	int	is_nb_t_eat;
+	
+	
+	//mutex write
+	//mutex *forks
+}				t_args;
+
+typedef struct s_philo
+{
+	int			id;
+	pthread_t	philo;
+	char		status;
+	int			nb_eat;
+	int			finish;  //1 when = nb_t_eat
+	pthread_mutex_t	*forks;
+}				t_philo;
+
+typedef struct	s_infos
+{
+	t_philo *ph;
+	t_args	args;
 }				t_infos;
 
 size_t	ft_strlen(const char *s);
