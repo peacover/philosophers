@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 15:14:06 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/09/10 10:27:11 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/10 15:09:39 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct s_args
 	int	end;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	write;
+	// pthread_mutex_t death;
 }				t_args;
 
 typedef struct s_philo
