@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 15:14:06 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/09/07 18:33:44 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/10 10:27:11 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,12 @@
 # include <sys/time.h>
 # include <pthread.h>
 
+# define TAKING_FORKS 1
+# define EAT 2
+# define SLEEP 3
+# define THINK 4
+# define DIE 5
+
 typedef struct s_args
 {
 	int	nb_ph;
@@ -28,26 +34,23 @@ typedef struct s_args
 	int	nb_t_eat;
 	int	is_nb_t_eat;
 	
-	
-	//mutex write
-	//mutex *forks
+	unsigned long start_time;
+	int	end;
+	pthread_mutex_t	*forks;
+	pthread_mutex_t	write;
 }				t_args;
 
 typedef struct s_philo
 {
 	int			id;
+	int			status;
 	pthread_t	philo;
-	char		status;
 	int			nb_eat;
-	int			finish;  //1 when = nb_t_eat
-	pthread_mutex_t	*forks;
+	int			finish;
+	unsigned long last_meal;
+	unsigned long next_meal;
+	t_args		*args;	
 }				t_philo;
-
-typedef struct	s_infos
-{
-	t_philo *ph;
-	t_args	args;
-}				t_infos;
 
 size_t	ft_strlen(const char *s);
 char	*ft_itoa(int n);

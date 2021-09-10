@@ -1,1 +1,1 @@
-{"version": "0.2.0", "configurations": [{"type": "lldb", "request": "launch", "name": "Debug", "program": "${workspaceFolder}/philo", "args": ["7", "8", "4", "5"], "cwd": "${workspaceFolder}"}]}
+{"version": "0.2.0", "configurations": [{"type": "lldb", "request": "launch", "name": "Debug", "program": "${workspaceFolder}/philo", "args": ["4", "200", "210", "200"], "cwd": "${workspaceFolder}"}]}
