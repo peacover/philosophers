@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 15:13:11 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/09/12 18:22:14 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/12 18:30:15 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -285,8 +285,8 @@ int		create_threads(t_args *args)
 	}
 	while (1)
 	{
-		if (check_death(ph))
-			return (1);
+		// if (check_death(ph))
+		// 	return (1);
 	}
 	return(1);
 }
