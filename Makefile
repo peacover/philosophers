@@ -3,7 +3,7 @@ CC = @gcc
 INC = -I ./
 SRCS = 	./main.c \
 		./philo_utils.c
-FLAGS = -Wall -Wextra -Werror -lpthread -g -fsanitize=address
+FLAGS = -Wall -Wextra -Werror -lpthread -g -fsanitize=thread
 OBJS = $(SRCS:.c=.o)
 all: $(NAME)
 	

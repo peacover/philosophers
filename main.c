@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 15:13:11 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/09/10 16:02:46 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/12 18:22:14 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,29 +94,76 @@ int	upload_infos(t_args *args, char **argv)
 	return (0);
 }
 
-void	print_msg(int status, t_philo *ph)
+void	print_msg(int status, t_philo *ph, unsigned long t)
 {
 	unsigned long time;
 
+	// if (ph->args->end)
+	// 	return ;
+	(void)t;
 	time = (current_time() - ph->args->start_time) / 1000 ;
 	pthread_mutex_lock(&ph->args->write);
 	if (status == TAKING_FORKS)
 		printf("%lu %d has taking a fork\n", time,  ph->id);
 	else if (status == EAT)
+	{
 		printf("%lu %d is eating\n", time, ph->id);
+		// ph->next_meal = time;
+	}
 	else if (status == SLEEP)
 	{
 		printf("%lu %d is sleeping\n", time, ph->id);
-		ph->last_meal = time;
+		// ph->last_meal = time;
 	}
 	else if (status == THINK)
-	{
 		printf("%lu %d is thinking\n", time, ph->id);
-		ph->next_meal = time;
-	}
 	else if (status == DIE)
+	{
 		printf("%lu %d died\n", time, ph->id);
+		return ;
+	}
 	pthread_mutex_unlock(&ph->args->write);
+}
+
+// int		check_death(t_philo *ph)
+// {
+// 	// unsigned long t = current_time();
+// 	// printf ("\n\n last : %lu | next : %lu | die : %d \n\n", ph->last_meal, ph->next_meal, ph->args->t_die);
+// 	// if ((current_time() - ph->last_meal) >= (unsigned long)(ph->args->t_die))
+// 	if ((ph->next_meal - ph->last_meal) >= (unsigned long)(ph->args->t_die))
+// 	{
+// 		ph->status = DIE;
+// 		// printf ("\n\ntime to die : %lu\n", ph->next_meal - ph->last_meal);
+// 		print_msg(ph->status, ph, 0);
+// 		ph->args->end = 1;
+// 		// detach_mutex(ph->args);
+// 		// free(ph->args->forks);
+// 		return (1);
+// 	}
+// 	return (0);
+// }
+
+int		check_death(t_philo *ph)
+{
+	int i;
+	// unsigned long t;
+
+	
+	i = -1;
+	while (++i < ph->args->nb_ph)
+	{
+		// printf ("\n\n id : %d | last_meal : %lu\n", ph[i].id, ph[i].last_meal);
+		// t = current_time();
+		// printf ("\n\n id : %d | last : %lu | current : %lu \n\n", ph->id, ph[i].last_meal, ph[(i + 1) % nb].last_meal);
+		if (ph[i].status != EAT && (current_time() - ph[i].last_meal) >= (unsigned long)(ph[i].args->t_die))
+		{
+			
+			ph[i].status = DIE;
+			print_msg(ph[i].status, &ph[i], 0);
+			return (1);
+		}
+	}
+	return (0);
 }
 
 void	take_forks(t_philo *ph)
@@ -124,16 +171,13 @@ void	take_forks(t_philo *ph)
 	int id;
 	int nb_ph;
 
-	// if (ph->args->end)
-	// 	return;
 	id = ph->id;
 	nb_ph = ph->args->nb_ph;
 	pthread_mutex_lock(&ph->args->forks[id]);
 	ph->status = TAKING_FORKS;
-	print_msg(ph->status, ph);
+	print_msg(ph->status, ph, 0);
 	pthread_mutex_lock(&ph->args->forks[(id + 1) % nb_ph]);
-	print_msg(ph->status, ph);
-	
+	print_msg(ph->status, ph, 0);
 }
 
 void	throw_forks(t_philo *ph)
@@ -141,8 +185,6 @@ void	throw_forks(t_philo *ph)
 	int id;
 	int nb_ph;
 
-	// if (ph->args->end)
-	// 	return;
 	id = ph->id;
 	nb_ph = ph->args->nb_ph;
 	pthread_mutex_unlock(&ph->args->forks[id]);
@@ -151,31 +193,28 @@ void	throw_forks(t_philo *ph)
 
 void	eating(t_philo *ph)
 {
-	// if (ph->args->end)
-	// 	return;
+	ph->last_meal = current_time();
 	ph->status = EAT;
-	print_msg(ph->status, ph);
+	print_msg(ph->status, ph, 0);
 	ft_usleep(ph->args->t_eat * 1000);
 	ph->nb_eat++;
-	if (ph->args->is_nb_t_eat && (ph->nb_eat == ph->args->nb_t_eat))
-		ph->finish = 1;
+	// if (ph->args->is_nb_t_eat && (ph->nb_eat == ph->args->nb_t_eat))
+	// 	ph->finish = 1;
 }
 
 void	sleeping(t_philo *ph)
 {
-	// if (ph->args->end)
-	// 	return;
 	ph->status = SLEEP;
-	print_msg(ph->status, ph);
+	print_msg(ph->status, ph, 0);
 	ft_usleep(ph->args->t_sleep * 1000);
 }
 
 void	thinking(t_philo *ph)
 {
 	// if (ph->args->end)
-	// 	return;
+	// 	return ;
 	ph->status = THINK;
-	print_msg(ph->status, ph);
+	print_msg(ph->status, ph, 0);
 }
 
 void	detach_mutex(t_args *args)
@@ -188,34 +227,10 @@ void	detach_mutex(t_args *args)
 		pthread_mutex_destroy(&args->forks[i]);
 }
 
-int		check_death(t_philo *ph)
-{
-	// printf ("\n\n last : %lu | next : %lu | die : %d \n\n", ph->last_meal, ph->next_meal, ph->args->t_die);
-	int i;
-
-	i = 0;
-	// printf("%d\n", ph[i].args->nb_ph);
-	while (ph[i].args->nb_ph > i)
-	{
-		if ((ph[i].next_meal - ph[i].last_meal) >= (unsigned long)(ph[i].args->t_die))
-		// if ((current_time() - ph[i].last_meal) >= (unsigned long)(ph[i].args->t_die))
-		{
-			ph[i].status = DIE;
-			print_msg(ph[i].status, &ph[i]);
-			return (1);
-		}
-		// if ()
-		i++;
-	}
-	return (0);
-}
-
 void	*fun_thread(void *tmp)
 {
 	t_philo *ph;
-	int i;
-	
-	i = -1;
+
 	ph = (t_philo *)tmp;
 	while (1)
 	{
@@ -233,8 +248,8 @@ void	init_mutex(t_args *args, t_philo *ph)
 	int i;
 
 	i = -1;
-	// pthread_mutex_init(&args->death, NULL);
 	args->forks = malloc(sizeof(pthread_mutex_t) * args->nb_ph);
+	pthread_mutex_init(&args->write, NULL);
 	while (args->nb_ph > ++i)
 	{
 		ph[i].args = args;
@@ -261,34 +276,19 @@ int		create_threads(t_args *args)
 	ph = malloc(sizeof(t_philo) * args->nb_ph);
 	init_mutex(args, ph);
 	ph->args->start_time = current_time();
-	// pthread_mutex_lock(&args->death);
-	while (args->nb_ph > ++i && !args->end)
+	while (args->nb_ph > ++i)
 	{
 		ph[i].id = i + 1;
 		init_philo(ph[i]);
 		pthread_create(&ph[i].philo, NULL, &fun_thread, &ph[i]);
 		usleep(100);
-		// printf ("\n\n %d end = %d \n\n", i + 1, args->end);
 	}
 	while (1)
 	{
-		if (check_death(ph) == 1)
-			break;
-		/* code */
+		if (check_death(ph))
+			return (1);
 	}
-	
-	// i = -1;
-	// if (args->end)
-		// return;
-	// while (args->nb_ph > ++i)
-	// 	pthread_join(ph[i].philo, NULL);
-	i = -1;
-	while (args->nb_ph > ++i)
-		pthread_mutex_destroy(&args->forks[i]);
-	pthread_mutex_destroy(&args->write);
-	free(args->forks);
-	// free(ph);
-	return(0);
+	return(1);
 }
 
 int	main(int argc, char **argv)

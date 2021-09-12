@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 15:14:06 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/09/10 15:09:39 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/12 13:35:12 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,4 +60,5 @@ int		ft_strcmp(char *s1, char *s2);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 char	*ft_strdup(const char *s1);
 
+int		check_death(t_philo *ph);
 # endif
