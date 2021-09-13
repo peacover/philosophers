@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 15:13:11 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/09/13 16:55:09 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/13 18:39:16 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,8 +119,10 @@ void	print_msg(int status, t_philo *ph)
 int		check_death(t_philo *ph)
 {
 	int i;
+	int t;
 
 	i = -1;
+	t = 0;
 	while (++i < ph->args->nb_ph)
 	{
 		if (ph[i].status != EAT && (current_time() - ph[i].last_meal) > ph[i].args->t_die)
@@ -129,6 +131,8 @@ int		check_death(t_philo *ph)
 			print_msg(ph[i].status, &ph[i]);
 			return (1);
 		}
+		else if (ph[i].args->is_nb_t_eat && (ph[i].nb_eat == ph[i].args->nb_t_eat))
+			return (1);
 	}
 	return (0);
 }
@@ -165,8 +169,6 @@ void	eating(t_philo *ph)
 	print_msg(ph->status, ph);
 	ft_usleep(ph->args->t_eat);
 	ph->nb_eat++;
-	// if (ph->args->is_nb_t_eat && (ph->nb_eat == ph->args->nb_t_eat))
-	// 	ph->finish = 1;
 }
 
 void	sleeping(t_philo *ph)
