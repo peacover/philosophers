@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 15:13:11 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/09/12 18:30:15 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/13 16:55:09 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,21 +65,21 @@ int	check_args_init(int argc, char **argv, t_args *args)
 }
 
 
-unsigned long	current_time()
+int	current_time()
 {
 	struct timeval t;
 	
 	gettimeofday(&t, NULL);
-	return (t.tv_sec * 1000000 + t.tv_usec);
+	return (t.tv_sec * 1000 + t.tv_usec / 1000 );
 }
 
-void	ft_usleep(unsigned long t)
+void	ft_usleep(int t)
 {
-	unsigned long tmp;
+	int tmp;
 
 	tmp = current_time();
-	usleep(t - 10000);
-	while (current_time() - tmp < t)
+	usleep((t - 20) * 1000);
+	while (current_time() - tmp  < t)
 	;
 }
 
@@ -94,72 +94,39 @@ int	upload_infos(t_args *args, char **argv)
 	return (0);
 }
 
-void	print_msg(int status, t_philo *ph, unsigned long t)
+void	print_msg(int status, t_philo *ph)
 {
-	unsigned long time;
+	int time;
 
-	// if (ph->args->end)
-	// 	return ;
-	(void)t;
-	time = (current_time() - ph->args->start_time) / 1000 ;
+	time = (current_time() - ph->args->start_time);
 	pthread_mutex_lock(&ph->args->write);
 	if (status == TAKING_FORKS)
-		printf("%lu %d has taking a fork\n", time,  ph->id);
+		printf("%d %d has taking a fork\n", time,  ph->id);
 	else if (status == EAT)
-	{
-		printf("%lu %d is eating\n", time, ph->id);
-		// ph->next_meal = time;
-	}
+		printf("%d %d is eating\n", time, ph->id);
 	else if (status == SLEEP)
-	{
-		printf("%lu %d is sleeping\n", time, ph->id);
-		// ph->last_meal = time;
-	}
+		printf("%d %d is sleeping\n", time, ph->id);
 	else if (status == THINK)
-		printf("%lu %d is thinking\n", time, ph->id);
+		printf("%d %d is thinking\n", time, ph->id);
 	else if (status == DIE)
 	{
-		printf("%lu %d died\n", time, ph->id);
+		printf("%d %d died\n", time, ph->id);
 		return ;
 	}
 	pthread_mutex_unlock(&ph->args->write);
 }
 
-// int		check_death(t_philo *ph)
-// {
-// 	// unsigned long t = current_time();
-// 	// printf ("\n\n last : %lu | next : %lu | die : %d \n\n", ph->last_meal, ph->next_meal, ph->args->t_die);
-// 	// if ((current_time() - ph->last_meal) >= (unsigned long)(ph->args->t_die))
-// 	if ((ph->next_meal - ph->last_meal) >= (unsigned long)(ph->args->t_die))
-// 	{
-// 		ph->status = DIE;
-// 		// printf ("\n\ntime to die : %lu\n", ph->next_meal - ph->last_meal);
-// 		print_msg(ph->status, ph, 0);
-// 		ph->args->end = 1;
-// 		// detach_mutex(ph->args);
-// 		// free(ph->args->forks);
-// 		return (1);
-// 	}
-// 	return (0);
-// }
-
 int		check_death(t_philo *ph)
 {
 	int i;
-	// unsigned long t;
 
-	
 	i = -1;
 	while (++i < ph->args->nb_ph)
 	{
-		// printf ("\n\n id : %d | last_meal : %lu\n", ph[i].id, ph[i].last_meal);
-		// t = current_time();
-		// printf ("\n\n id : %d | last : %lu | current : %lu \n\n", ph->id, ph[i].last_meal, ph[(i + 1) % nb].last_meal);
-		if (ph[i].status != EAT && (current_time() - ph[i].last_meal) >= (unsigned long)(ph[i].args->t_die))
+		if (ph[i].status != EAT && (current_time() - ph[i].last_meal) > ph[i].args->t_die)
 		{
-			
 			ph[i].status = DIE;
-			print_msg(ph[i].status, &ph[i], 0);
+			print_msg(ph[i].status, &ph[i]);
 			return (1);
 		}
 	}
@@ -171,13 +138,13 @@ void	take_forks(t_philo *ph)
 	int id;
 	int nb_ph;
 
-	id = ph->id;
+	id = ph->id - 1;
 	nb_ph = ph->args->nb_ph;
 	pthread_mutex_lock(&ph->args->forks[id]);
 	ph->status = TAKING_FORKS;
-	print_msg(ph->status, ph, 0);
+	print_msg(ph->status, ph);
 	pthread_mutex_lock(&ph->args->forks[(id + 1) % nb_ph]);
-	print_msg(ph->status, ph, 0);
+	print_msg(ph->status, ph);
 }
 
 void	throw_forks(t_philo *ph)
@@ -185,7 +152,7 @@ void	throw_forks(t_philo *ph)
 	int id;
 	int nb_ph;
 
-	id = ph->id;
+	id = ph->id - 1;
 	nb_ph = ph->args->nb_ph;
 	pthread_mutex_unlock(&ph->args->forks[id]);
 	pthread_mutex_unlock(&ph->args->forks[(id + 1) % nb_ph]);
@@ -195,8 +162,8 @@ void	eating(t_philo *ph)
 {
 	ph->last_meal = current_time();
 	ph->status = EAT;
-	print_msg(ph->status, ph, 0);
-	ft_usleep(ph->args->t_eat * 1000);
+	print_msg(ph->status, ph);
+	ft_usleep(ph->args->t_eat);
 	ph->nb_eat++;
 	// if (ph->args->is_nb_t_eat && (ph->nb_eat == ph->args->nb_t_eat))
 	// 	ph->finish = 1;
@@ -205,16 +172,14 @@ void	eating(t_philo *ph)
 void	sleeping(t_philo *ph)
 {
 	ph->status = SLEEP;
-	print_msg(ph->status, ph, 0);
-	ft_usleep(ph->args->t_sleep * 1000);
+	print_msg(ph->status, ph);
+	ft_usleep(ph->args->t_sleep);
 }
 
 void	thinking(t_philo *ph)
 {
-	// if (ph->args->end)
-	// 	return ;
 	ph->status = THINK;
-	print_msg(ph->status, ph, 0);
+	print_msg(ph->status, ph);
 }
 
 void	detach_mutex(t_args *args)
@@ -257,14 +222,13 @@ void	init_mutex(t_args *args, t_philo *ph)
 	}
 }
 
-void	init_philo(t_philo ph)
+void	init_philo(t_philo *ph)
 {
-	ph.finish = 0;
-	ph.last_meal = 0;
-	ph.nb_eat = 0;
-	ph.next_meal = 0;
-	ph.status = 0;
-	ph.philo = NULL;
+	ph->finish = 0;
+	ph->last_meal = current_time();
+	ph->nb_eat = 0;
+	ph->status = 0;
+	ph->philo = NULL;
 }
 
 int		create_threads(t_args *args)
@@ -275,18 +239,18 @@ int		create_threads(t_args *args)
 	i = -1;
 	ph = malloc(sizeof(t_philo) * args->nb_ph);
 	init_mutex(args, ph);
-	ph->args->start_time = current_time();
+	args->start_time = current_time();
 	while (args->nb_ph > ++i)
 	{
 		ph[i].id = i + 1;
-		init_philo(ph[i]);
+		init_philo(&ph[i]);
 		pthread_create(&ph[i].philo, NULL, &fun_thread, &ph[i]);
 		usleep(100);
 	}
 	while (1)
 	{
-		// if (check_death(ph))
-		// 	return (1);
+		if (check_death(ph))
+			return (1);
 	}
 	return(1);
 }

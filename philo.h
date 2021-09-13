@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 15:14:06 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/09/12 13:35:12 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/13 16:30:53 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,22 +34,23 @@ typedef struct s_args
 	int	nb_t_eat;
 	int	is_nb_t_eat;
 	
-	unsigned long start_time;
+	int start_time;
 	int	end;
+	pthread_t		check_eat;
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	write;
-	// pthread_mutex_t death;
+	
 }				t_args;
 
 typedef struct s_philo
-{
+{                     
 	int			id;
 	int			status;
 	pthread_t	philo;
 	int			nb_eat;
 	int			finish;
-	unsigned long last_meal;
-	unsigned long next_meal;
+	int			last_meal;
+	pthread_mutex_t is_eating;
 	t_args		*args;	
 }				t_philo;
 
