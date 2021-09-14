@@ -6,7 +6,7 @@
 /*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 15:13:11 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/09/13 18:39:16 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/14 08:24:04 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ void	ft_init(t_args *args)
 	args->t_sleep = 0; 
 	args->nb_t_eat = 0;
 	args->is_nb_t_eat = 0;
-	args->end = 0;
 	args->start_time = 0;
 }
 
@@ -125,15 +124,21 @@ int		check_death(t_philo *ph)
 	t = 0;
 	while (++i < ph->args->nb_ph)
 	{
+		if (ph[i].status != EAT)
+			pthread_mutex_lock(&ph->is_eating);
 		if (ph[i].status != EAT && (current_time() - ph[i].last_meal) > ph[i].args->t_die)
 		{
 			ph[i].status = DIE;
 			print_msg(ph[i].status, &ph[i]);
 			return (1);
 		}
-		else if (ph[i].args->is_nb_t_eat && (ph[i].nb_eat == ph[i].args->nb_t_eat))
-			return (1);
+		else if (ph[i].nb_eat == ph[i].args->nb_t_eat)
+			t++;
+		usleep(800);
+		pthread_mutex_unlock(&ph->is_eating);
 	}
+	if (ph->args->is_nb_t_eat && ph->args->nb_t_eat == t)
+		return (1);
 	return (0);
 }
 
@@ -164,11 +169,13 @@ void	throw_forks(t_philo *ph)
 
 void	eating(t_philo *ph)
 {
+	pthread_mutex_lock(&ph->is_eating);
 	ph->last_meal = current_time();
 	ph->status = EAT;
 	print_msg(ph->status, ph);
 	ft_usleep(ph->args->t_eat);
 	ph->nb_eat++;
+	pthread_mutex_unlock(&ph->is_eating);
 }
 
 void	sleeping(t_philo *ph)
@@ -226,11 +233,11 @@ void	init_mutex(t_args *args, t_philo *ph)
 
 void	init_philo(t_philo *ph)
 {
-	ph->finish = 0;
 	ph->last_meal = current_time();
 	ph->nb_eat = 0;
 	ph->status = 0;
 	ph->philo = NULL;
+	pthread_mutex_init(&ph->is_eating, NULL);
 }
 
 int		create_threads(t_args *args)
@@ -247,12 +254,13 @@ int		create_threads(t_args *args)
 		ph[i].id = i + 1;
 		init_philo(&ph[i]);
 		pthread_create(&ph[i].philo, NULL, &fun_thread, &ph[i]);
-		usleep(100);
+		usleep(800);
 	}
 	while (1)
 	{
 		if (check_death(ph))
 			return (1);
+		usleep(800);
 	}
 	return(1);
 }
