@@ -2,8 +2,12 @@ NAME = philo
 CC = @gcc
 INC = -I ./
 SRCS = 	./main.c \
-		./philo_utils.c
-FLAGS = -Wall -Wextra -Werror -lpthread -g -fsanitize=address
+		./philo_utils.c \
+		./philo_utils2.c \
+		./operations.c \
+		./parsing.c \
+		./init.c
+FLAGS = -Wall -Wextra -Werror -lpthread #-fsanitize=address
 OBJS = $(SRCS:.c=.o)
 all: $(NAME)
 	

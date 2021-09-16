@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yer-raki <yer-raki@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: yer-raki <yer-raki@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 17:26:08 by yer-raki          #+#    #+#             */
-/*   Updated: 2021/07/05 17:31:38 by yer-raki         ###   ########.fr       */
+/*   Updated: 2021/09/14 15:09:29 by yer-raki         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,46 +113,4 @@ size_t	ft_strlen(const char *s)
 	while (s[i])
 		i++;
 	return (i);
-}
-
-char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	size_t	i;
-	char	*dest;
-
-	i = 0;
-	dest = (char *)malloc((len + 1) * sizeof(char));
-	if (!dest)
-		return (NULL);
-	if (!s)
-		return (NULL);
-	if ((size_t)start > ft_strlen(s))
-		return (ft_strdup(""));
-	while (len > i && s[i] != '\0')
-	{
-		dest[i] = s[start + i];
-		i++;
-	}
-	dest[i] = '\0';
-	return (dest);
-}
-
-char	*ft_strdup(const char *s1)
-{
-	int		i;
-	int		l;
-	char	*d;
-
-	i = 0;
-	l = ft_strlen(s1);
-	d = (char *)malloc(sizeof(char) * (l + 1));
-	if (!d)
-		return (NULL);
-	while (l > i)
-	{
-		d[i] = s1[i];
-		i++;
-	}
-	d[i] = '\0';
-	return (d);
 }
